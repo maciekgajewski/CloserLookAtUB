@@ -13,6 +13,8 @@ Maciej Gajewski
 * I work at Optiver, Amsterdam
 * Role: C++ Developer and teacher
 
+<img src="pics/Maciek.jpg" height="200"/>
+<img src="pics/optiver_logo_black.png" height="100"/>
 ---
 
 # Some code
