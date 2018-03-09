@@ -42,11 +42,15 @@
       }
       .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
 
-     .pull-left {
-        float: left;
-        width: 47%;
-      }
-      .pull-right {
-        float: right;
-        width: 47%;
-      }
+.pull-left {
+  float: left;
+  width: 47%;
+}
+.pull-right {
+  float: right;
+  width: 47%;
+}
+
+code {
+  border-radius: 5px;
+}

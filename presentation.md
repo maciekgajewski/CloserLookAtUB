@@ -16,7 +16,11 @@ Maciej Gajewski
 ---
 
 # Some code
-.pull-left[```C++
+.pull-left[
+
+### Left column
+
+```C++
 int fun(int i)
 {
 	int array[4];
@@ -25,7 +29,11 @@ int fun(int i)
 }
 ```]
 
-.pull-right[```C++
+.pull-right[
+
+### Right column
+
+```C++
 int fun(int)
 {
 	return 333;
