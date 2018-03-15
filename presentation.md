@@ -65,43 +65,11 @@ Survey the auodience: who knows compiler expored.
 Great tool for teachers and tweakers
 Basic assembly required
 
+<!-- ====== Null pointer ======== -->
 
 ---
 class: center, middle
-# Part 1
-## Accessing array out of bounds
-
----
-# Very simple example
-.pull-left[
-This code
-```cpp
-void fun(int idx, int val) {
-	int array[3];
-	array[idx] = val;
-	return array[idx];
-}
-```
-]
---
-.pull-right[
-is compiled to
-```cpp
-void fun(int, int val) {
-	return val;
-}
-```
-]
-
-???
-Seems like a contrive example, but the code may be a result of 
-- inlining, 
-- dead-branch remove, 
-- compile-time evauation of constant expressions
-
----
-class: center, middle
-# Part 2
+# Chapter 1
 ## Null-pointer dereference
 
 ---
@@ -302,3 +270,133 @@ void fun2(Widget* w) {
 ???
 
 final stage
+
+<!-- TODO: add the kernel bug -->
+
+
+<!-- ====== Array ======== -->
+
+
+
+---
+class: center, middle
+# Part 1
+## Accessing array out of bounds
+
+---
+# Very simple example
+.pull-left[
+This code
+```cpp
+void fun(int idx, int val) {
+	int array[3];
+	array[idx] = val;
+	return array[idx];
+}
+```
+]
+--
+.pull-right[
+is compiled to
+```cpp
+void fun(int, int val) {
+	return val;
+}
+```
+]
+
+???
+Seems like a contrived example, but the code may be a result of 
+- inlining, 
+- dead-branch remove, 
+- compile-time evauation of constant expressions
+
+---
+# A subtle bug
+.pull-left[
+This code
+```cpp
+template<typename T, size_t N>
+bool is_in_arr(array<T, N> arr, T v)
+{
+	for(int i = 0; i < N; i++)
+		if (arr[i] == v)
+			return true;
+
+	return false;
+}
+```
+]
+---
+# A subtle bug
+.pull-left[
+This code
+```cpp
+template<typename T, size_t N>
+bool is_in_arr(array<T, N> arr, T v)
+{
+	for(int i = 0; i < N; i++)
+		if (arr[i] == v)
+			return true;
+
+	return false;
+}
+
+bool is_right_angle(int deg)
+{
+	array<int, 4> arr 
+		= {0, 90, 180, 270};
+	return is_in_arr(arr, deg);
+}```
+]
+--
+.pull-right[
+is compiled to
+```asm
+s_right_angle(int):
+	test edi, edi
+	je .L5
+	cmp edi, 90
+	je .L5
+	cmp edi, 180
+	je .L5
+	cmp edi, 270
+	sete al
+	ret
+.L5:
+	mov eax, 1
+	ret
+```
+]
+---
+# A subtle bug (2)
+.pull-left[
+This code
+```cpp
+template<typename T, size_t N>
+bool is_in_arr(array<T, N> arr, T v)
+{
+	for(int i = 0; i `<=` N; i++)
+		if (arr[i] == v)
+			return true;
+
+	return false;
+}
+
+bool is_right_angle(int deg)
+{
+	array<int, 4> arr 
+		= {0, 90, 180, 270};
+	return is_in_arr(arr, deg);
+}```
+]
+--
+.pull-right[
+is compiled to
+```asm
+s_right_angle(int):
+	mov eax, 1
+	ret
+```
+]
+
