@@ -67,10 +67,42 @@ Basic assembly required
 
 
 ---
+class: center, middle
 # Part 1
-## Null-pointer dereference
+## Accessing array out of bounds
 
-> dereferencing a null pointer is undefined behavior
+---
+# Very simple example
+.pull-left[
+This code
+```cpp
+void fun(int idx, int val) {
+	int array[3];
+	array[idx] = val;
+	return array[idx];
+}
+```
+]
+--
+.pull-right[
+is compiled to
+```cpp
+void fun(int, int val) {
+	return val;
+}
+```
+]
+
+???
+Seems like a contrive example, but the code may be a result of 
+- inlining, 
+- dead-branch remove, 
+- compile-time evauation of constant expressions
+
+---
+class: center, middle
+# Part 2
+## Null-pointer dereference
 
 ---
 
