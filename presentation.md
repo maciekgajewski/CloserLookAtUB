@@ -86,14 +86,14 @@ size_t fread(void* buf, size_t size, FILE* s)
 	return copy_from_buffer(buf, size, s);
 }
 ```
-
+--
 would really be this:
-```C
+```c
 size_t fread(void* buf, size_t size, FILE* s)
 {
-	if (!s) __raise_error();
+	`if (!s) __raise_error();`
 	if(s->bsize = 0) {
-		if (!s->vtbl || ! s->vtbl->read) __raise_error();
+		`if (!s->vtbl || ! s->vtbl->read) __raise_error();`
 		s->bsize = (*s->vtbl->read)(s->buf, s->bufsize, s->fd);
 	}
 	return copy_from_buffer(buf, size, s);
@@ -102,29 +102,171 @@ size_t fread(void* buf, size_t size, FILE* s)
 
 ???
 Compiler would be forced to generate code checking for null pointer every time a pointer is accessed.
+And if this is not C++ enough....
 
 ---
-# Some code
+
+### If dereferencing nullptr was defined...
+
+This C++ code...
+```cpp
+size_t File::read(void* buf, size_t size)
+{
+	if(bsize = 0) {
+		bsize = do_read(buf, bufsize, fd);
+	}
+	return copy_from_buffer(buf, size);
+}
+```
+would really be this:
+```c
+size_t File::read(File* this, void* buf, size_t size)
+{
+	`if (!this) __raise_error();`
+	if(this->bsize = 0) {
+		`if (!this->vtbl || ! this->vtbl->do_read) __raise_error();`
+		this->bsize = (*this->vtbl->do_read)(this, this->buf, this->bufsize, this->fd);
+	}
+	return copy_from_buffer(this, buf, size);
+}
+```
+
+???
+But compilers are not doing that!
+
+---
+### Dereferencing nullptr
+
 .pull-left[
-
-### Left column
-
-```C++
-int fun(int i)
-{
-	int array[4];
-	array[i] = 333;
-	return array[i];
+This code
+```cpp
+// Safe to call with nullptr
+void fun(Widget* w) {
+	if (w)
+		do_smth(w->data);
+	else
+		report_error();
 }
-```]
 
+// 'w' can't be null!
+void fun2(Widget* w) {
+	w->data = get_data();
+	fun(w);
+}
+```
+]
+--
 .pull-right[
-
-### Right column
-
-```C++
-int fun(int)
-{
-	return 333;
+	after inlining
+```cpp
+// Safe to call with nullptr
+void fun(Widget* w) {
+	if (w)
+		do_smth(w->data);
+	else
+		report_error();
 }
-```]
+
+// 'w' can't be null!
+void fun2(Widget* w) {
+	w->data = get_data();
+	if (w)
+		do_smth(w->data);
+	else
+		report_error();
+}
+```
+]
+
+???
+
+first step - inlining
+---
+### Dereferencing nullptr
+
+.pull-left[
+This code
+```cpp
+// Safe to call with nullptr
+void fun(Widget* w) {
+	if (w)
+		do_smth(w->data);
+	else
+		report_error();
+}
+
+// 'w' can't be null!
+void fun2(Widget* w) {
+	w->data = get_data();
+	fun(w);
+}
+```
+]
+.pull-right[
+	after inlining
+```cpp
+// Safe to call with nullptr
+void fun(Widget* w) {
+	if (w)
+		do_smth(w->data);
+	else
+		report_error();
+}
+
+// 'w' can't be null!
+void fun2(Widget* w) {
+	w->data = get_data();
+	`if (w)`
+		do_smth(w->data);
+	`else`
+		`report_error();`
+}
+```
+]
+
+???
+
+next step - removing null branch
+---
+### Dereferencing nullptr
+
+.pull-left[
+This code
+```cpp
+// Safe to call with nullptr
+void fun(Widget* w) {
+	if (w)
+		do_smth(w->data);
+	else
+		report_error();
+}
+
+// 'w' can't be null!
+void fun2(Widget* w) {
+	w->data = get_data();
+	fun(w);
+}
+```
+]
+.pull-right[
+optimized
+```cpp
+// Safe to call with nullptr
+void fun(Widget* w) {
+	if (w)
+		do_smth(w->data);
+	else
+		report_error();
+}
+
+// 'w' can't be null!
+void fun2(Widget* w) {
+	w->data = get_data();
+	do_smth(w->data);
+}
+```
+]
+
+???
+
+final stage
