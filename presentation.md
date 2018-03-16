@@ -13,9 +13,10 @@ Maciej Gajewski
 * I work at Optiver, Amsterdam
 * Role: C++ Developer and teacher
 
+.center[
 <img src="pics/Maciek.jpg" height="200"/>
 <img src="pics/optiver_logo_black.png" height="100"/>
-
+]
 ---
 
 # Undefined Behavior
@@ -24,6 +25,10 @@ Maciej Gajewski
 > “When the compiler encounters [a given undefined construct] it is legal for it to make demons fly out of your nose”
 
 comp.std.c, 1992
+
+.center[
+<img src="pics/demon-bw1.png"/>
+]
 
 ???
 
