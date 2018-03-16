@@ -276,7 +276,72 @@ void fun2(Widget* w) {
 
 final stage
 
-<!-- TODO: add the kernel bug -->
+
+---
+
+# Nice!
+### , but...
+
+.center[
+	<img src="pics/demon-bw1.png"/>
+]
+
+---
+### Actual Kernel code
+
+```c
+static unsigned int tun_chr_poll(struct file *file, poll_table * wait)
+{
+	struct tun_file *tfile = file->private_data;
+	struct tun_struct *tun = __tun_get(tfile);
+	unsigned int mask = 0;
+
+	if (!tun)
+		return POLLERR;
+	// ... rest of the code
+```
+
+https://lwn.net/Articles/342330/
+???
+It is C, so variable intiializations must be at the beginning
+
+"The TUN/TAP driver provides a virtual network device which performs packet tunneling; it's useful in a number of situations, including virtualization, virtual private networks, and more. "
+---
+### Actual Kernel code
+
+```c
+static unsigned int tun_chr_poll(struct file *file, poll_table * wait)
+{
+	struct tun_file *tfile = file->private_data;
+	struct tun_struct *tun = __tun_get(tfile);
+	`struct sock *sk = tun->sk;`
+	unsigned int mask = 0;
+
+	if (!tun)
+		return POLLERR;
+	// ... rest of the code
+```
+???
+The line has been added in the header of the function
+
+---
+### Actual Kernel code
+
+```c
+static unsigned int tun_chr_poll(struct file *file, poll_table * wait)
+{
+	struct tun_file *tfile = file->private_data;
+	struct tun_struct *tun = __tun_get(tfile);
+	`struct sock *sk = tun->sk;`
+	unsigned int mask = 0;
+
+	`if (!tun)`
+		`return POLLERR;`
+	// ... rest of the code
+```
+???
+And suddenly, the if disappears.
+Attacker may actually map some malicious code at address 0
 
 
 <!-- ====== Array ======== -->
@@ -285,7 +350,7 @@ final stage
 
 ---
 class: center, middle
-# Part 1
+# Chapter 2
 ## Accessing array out of bounds
 
 ---
@@ -315,6 +380,15 @@ Seems like a contrived example, but the code may be a result of
 - inlining, 
 - dead-branch remove, 
 - compile-time evauation of constant expressions
+
+---
+
+# Nice!
+### , but...
+
+.center[
+	<img src="pics/demon-bw1.png"/>
+]
 
 ---
 # A subtle bug
@@ -405,3 +479,67 @@ s_right_angle(int):
 ```
 ]
 
+---
+TODO: flow diagram here
+
+---
+class: center, middle
+# Chapter 3
+## Signed integer overflow
+
+---
+# Optimization
+
+.pull-left[
+This code
+```cpp
+void zero_arr(float* arr, int off)
+{
+	for (int i = 0; i != 10000; ++i)
+		arr[i+off] = 0.0f;
+}
+```
+]
+--
+.pull-right[
+is compiled to the eqivalent of
+```cpp
+void zero_arr(float* arr, int off)
+{
+	::memset(arr+off, 0, 40000);
+}
+```
+]
+
+???
+Nice, huh? memset probably uses all the vectorization techniquest youre CPU support.
+
+---
+# Optimization
+
+.pull-left[
+This code
+```cpp
+int sum(size_t count)
+{
+	int sum = 0;
+	for (int i = 0; i < count; i++)
+		sum += i;
+	return sum;
+}
+```
+]
+--
+.pull-right[
+Clang compiles it to:
+```cpp
+int sum(size_t count)
+{
+	return (count * (count+1))/2;
+}
+```
+]
+???
+Clang is able to work-out the close-form solution
+
+TODO: explanation:?
