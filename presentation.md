@@ -20,6 +20,15 @@ Maciej Gajewski
 ---
 
 # Undefined Behavior
+### What triggers UB in C++
+
+* Dereferencing null pointer
+* Accessing array out of bounds
+* Overflowing signed integer
+* Using uninitialized value
+---
+
+# Undefined Behavior
 ### The popular definition
 
 > “When the compiler encounters [a given undefined construct] it is legal for it to make demons fly out of your nose”
@@ -33,6 +42,7 @@ comp.std.c, 1992
 ???
 
 Completely useless from educational point of view.
+Will demons fly out of your nose if you dereference nullptr? If you use uninitialized value?
 
 ---
 # Undefined Behavior
@@ -40,6 +50,8 @@ Completely useless from educational point of view.
 
 * Machine-dependent behavior that would be too costly to define
 * Something, that compiler can assume you would never do
+--
+* Magical way in which compiler reads your comments
 
 
 ---
@@ -432,7 +444,7 @@ bool is_right_angle(int deg)
 .pull-right[
 is compiled to
 ```asm
-s_right_angle(int):
+is_right_angle(int):
 	test edi, edi
 	je .L5
 	cmp edi, 90
@@ -473,15 +485,19 @@ bool is_right_angle(int deg)
 .pull-right[
 is compiled to
 ```asm
-s_right_angle(int):
+is_right_angle(int):
 	mov eax, 1
 	ret
 ```
 ]
 
 ---
-TODO: flow diagram here
+background-image: url(pics/ubdiagram1.png)
+---
+background-image: url(pics/ubdiagram2.png)
 
+
+<!-- --------- Signed integer overflow            -->
 ---
 class: center, middle
 # Chapter 3
