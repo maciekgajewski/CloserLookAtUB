@@ -690,3 +690,71 @@ fun():
 ]
 ???
 Garbage in - garbage out
+---
+# Erasing your HD with UB
+
+
+.pull-left[
+This code
+```cpp
+static void (*fptr)();
+
+static void erase_hd()
+{
+	::system("rm -rf /");
+}
+
+void set_fptr() { fptr = erase_hd; }
+
+void call_fptr() { fptr(); }
+```
+]
+--
+.pull-right[
+Clang compiles it to:
+```cpp
+void set_fptr() { }
+
+void call_fptr()
+{
+	::system("rm -rf /");
+}
+
+```
+]
+???
+GCC generates more faithful code
+---
+# Erasing your HD with UB
+
+
+.pull-left[
+This code
+```cpp
+static void (*fptr)() = `nullptr`;
+
+static void erase_hd()
+{
+	::system("rm -rf /");
+}
+
+void set_fptr() { fptr = erase_hd; }
+
+void call_fptr() { fptr(); }
+```
+]
+.pull-right[
+Clang compiles it to:
+
+```cpp
+void set_fptr() { }
+
+void call_fptr()
+{
+	::system("rm -rf /");
+}
+
+```
+]
+???
+Also a manifestation of dereferencing nullptr
