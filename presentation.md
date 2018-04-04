@@ -53,6 +53,7 @@ Will demons fly out of your nose if you dereference nullptr? If you use uninitia
 * Machine-dependent behavior that would be too costly to define
 * Something, that compiler can assume you would never do
 --
+
 * Magical way in which compiler reads your comments
 
 
@@ -758,3 +759,12 @@ void call_fptr()
 ]
 ???
 Also a manifestation of dereferencing nullptr
+
+---
+# The Last Slide
+
+* Maciej Gajewski <maciej.gajewski0@gmail.com>
+* This presentation: https://maciekgajewski.github.io/CloserLookAtUB/
+* Compiler Explorer: https://gcc.godbolt.org
+* CppCon 2017 _“What Has My Compiler Done for Me Lately?”_
+* LLVM Project Blog _"What Every C Programmer Should Know About Undefined Behavior"_
