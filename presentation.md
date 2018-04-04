@@ -22,10 +22,12 @@ Maciej Gajewski
 # Undefined Behavior
 ### What triggers UB in C++
 
-* Dereferencing null pointer
+* Dereferencing null/wild pointer
 * Accessing array out of bounds
 * Overflowing signed integer
 * Using uninitialized value
+* Oversized integer shift
+* Violating type rules
 ---
 
 # Undefined Behavior
@@ -528,7 +530,7 @@ void zero_arr(float* arr, int off)
 ]
 
 ???
-Nice, huh? memset probably uses all the vectorization techniquest youre CPU support.
+Nice, huh? memset probably uses all the vectorization techniquest your CPU supports.
 
 ---
 # Optimization
@@ -558,4 +560,133 @@ int sum(size_t count)
 ???
 Clang is able to work-out the close-form solution
 
-TODO: explanation:?
+---
+
+# Nice!
+### , but...
+
+.center[
+	<img src="pics/demon-bw1.png"/>
+]
+
+---
+# Detecting overflow
+
+```cpp
+void zero_arr(float* arr, int off)
+{
+	if (off + 10000 < off)
+		throw overflow_error();
+	
+	for (int i = 0; i != 10000; ++i)
+		arr[i+off] = 0.0f;
+}
+```
+---
+# Detecting overflow
+
+```cpp
+void zero_arr(float* arr, int off)
+{
+	`if (off + 10000 < off)`       // this code
+		`throw overflow_error();`  // goes away
+	
+	for (int i = 0; i != 10000; ++i)
+		arr[i+off] = 0.0f;
+}
+```
+???
+This code goes away!
+
+---
+# Detecting overflow
+
+```cpp
+void zero_arr(float* arr, int off)
+{
+	if (off > MAX_INT - 10000)
+		throw overflow_error();
+	
+	for (int i = 0; i != 10000; ++i)
+		arr[i+off] = 0.0f;
+}
+```
+<!-- --------- Using undefined value            -->
+---
+class: center, middle
+# Chapter 4
+## Use of an uninitialized variable
+
+---
+# Optimization
+
+.pull-left[
+This code
+```cpp
+enum side { BUY, SELL };
+
+// s must be 'b' or 's'!
+side decode_side(char s)
+{
+	side r;
+	if (s == 'b')
+		r = BUY;
+	if (s == 's')
+		r = SELL;
+	return r;
+}```
+]
+--
+.pull-right[
+Compiles as:
+```cpp
+enum side { BUY, SELL };
+
+// s must be 'b' or 's'!
+side decode_side(char s)
+{
+	if (s == 'b')
+		return BUY;
+	else
+		return SELL;
+}
+```
+]
+???
+Passing invalid value will not make the return value random
+
+
+---
+# Garbage in - garbage out
+
+
+.pull-left[
+This code
+```cpp
+void fun()
+{
+	int x;
+	if (x != 7)
+		foo();
+	else
+		bar();
+}```
+]
+--
+.pull-right[
+clang:
+```asm
+fun(): # @fun()
+	jmp bar() # TAILCALL
+```
+]
+--
+.pull-right[
+gcc:
+```asm
+fun():
+	jmp foo()
+```
+]
+???
+Garbage in - garbage out
