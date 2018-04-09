@@ -772,7 +772,7 @@ void call_fptr()
 }
 
 ```
-]Undefined Behavior != Unsafe Programming
+]
 ???
 Also a manifestation of dereferencing nullptr
 
