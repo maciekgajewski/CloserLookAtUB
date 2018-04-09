@@ -100,7 +100,7 @@ This C code...
 ```cpp
 size_t fread(void* buf, size_t size, FILE* s)
 {
-	if(s->bsize = 0) {
+	if(s->bsize == 0) {
 		s->bsize = (*s->vtbl->read)(s->buf, s->bufsize, s->fd);
 	}
 	return copy_from_buffer(buf, size, s);
@@ -112,7 +112,7 @@ would really be this:
 size_t fread(void* buf, size_t size, FILE* s)
 {
 	`if (!s) __raise_error();`
-	if(s->bsize = 0) {
+	if(s->bsize == 0) {
 		`if (!s->vtbl || ! s->vtbl->read) __raise_error();`
 		s->bsize = (*s->vtbl->read)(s->buf, s->bufsize, s->fd);
 	}
@@ -132,7 +132,7 @@ This C++ code...
 ```cpp
 size_t File::read(void* buf, size_t size)
 {
-	if(bsize = 0) {
+	if(bsize == 0) {
 		bsize = do_read(buf, bufsize, fd);
 	}
 	return copy_from_buffer(buf, size);
@@ -143,7 +143,7 @@ would really be this:
 size_t File::read(File* this, void* buf, size_t size)
 {
 	`if (!this) __raise_error();`
-	if(this->bsize = 0) {
+	if(this->bsize == 0) {
 		`if (!this->vtbl || ! this->vtbl->do_read) __raise_error();`
 		this->bsize = (*this->vtbl->do_read)(this, this->buf, this->bufsize, this->fd);
 	}
