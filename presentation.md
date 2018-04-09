@@ -7,15 +7,28 @@ Maciej Gajewski
 
 ---
 
+# About Optiver
+
+* Amsterdam, Sydney, Chicago, Shanghai
+* Established in 1986
+* 440 people, 44 nationalities in Amsterdam
+* Big user of C++, mostly in Low Latency space
+* See Carl Cook's _"When a Microsecond Is an Eternity"_, CppCon2017
+
+.center[
+<img src="pics/optiver_logo_black.png" height="100"/>
+]
+---
+
 # About me
 
 * Maciek Gajewski [maciej.gajewski0@gmail.com](mailto:maciej.gajewski0@gmail.com)
-* I work at Optiver, Amsterdam
-* Role: C++ Developer and teacher
+* 30 years of programming, 20 years of C++
+* Role at Optiver: C++ Developer and teacher
+
 
 .center[
 <img src="pics/Maciek.jpg" height="200"/>
-<img src="pics/optiver_logo_black.png" height="100"/>
 ]
 ---
 
@@ -759,7 +772,7 @@ void call_fptr()
 }
 
 ```
-]
+]Undefined Behavior != Unsafe Programming
 ???
 Also a manifestation of dereferencing nullptr
 
@@ -769,5 +782,7 @@ Also a manifestation of dereferencing nullptr
 * Maciej Gajewski <maciej.gajewski0@gmail.com>
 * This presentation: https://maciekgajewski.github.io/CloserLookAtUB/
 * Compiler Explorer: https://gcc.godbolt.org
-* CppCon 2017 _“What Has My Compiler Done for Me Lately?”_
-* LLVM Project Blog _"What Every C Programmer Should Know About Undefined Behavior"_
+* CppCon 2017, _“What Has My Compiler Done for Me Lately?”_, Matt Godbolt
+* CppCon 2017, _"When a Microsecond Is an Eternity"_, Carl Cook
+* LLVM Project Blog, _"What Every C Programmer Should Know About Undefined Behavior"_
+* _"Undefined Behavior != Unsafe Programming"_ https://blog.regehr.org/archives/1467
