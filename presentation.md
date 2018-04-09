@@ -28,6 +28,7 @@ Maciej Gajewski
 * Using uninitialized value
 * Oversized integer shift
 * Violating type rules
+* Division by zero
 ---
 
 # Undefined Behavior
@@ -78,10 +79,12 @@ Too long to read during the presentation
 * CppCon 2017 _“What Has My Compiler Done for Me Lately?”_
 
 
-TODO: screenshot?
+.center[
+<img src="pics/godbolt.png" height="400"/>
+]
 
 ???
-Survey the auodience: who knows compiler expored.
+Survey the audience: who knows compiler exporer?
 Great tool for teachers and tweakers
 Basic assembly required
 
