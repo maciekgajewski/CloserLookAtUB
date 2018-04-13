@@ -1,7 +1,7 @@
 class: center, middle
 
 # Closer Look 
-## at Undefined Behaviour and Complier Optimizations
+## at Undefined Behaviour and Compiler Optimizations
 
 Maciej Gajewski
 
@@ -389,7 +389,7 @@ class: center, middle
 .pull-left[
 This code
 ```cpp
-void fun(int idx, int val) {
+int fun(int idx, int val) {
 	int array[3];
 	array[idx] = val;
 	return array[idx];
@@ -400,7 +400,7 @@ void fun(int idx, int val) {
 .pull-right[
 is compiled to
 ```cpp
-void fun(int, int val) {
+int fun(int, int val) {
 	return val;
 }
 ```
