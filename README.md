@@ -5,7 +5,7 @@
 In this talk we'll explore few interesting instances of undefined behaviour and compiler optimizations working together.
 We all know that invoking UB can, theoretically, result in your hard-drive being formatted. But what actually happens? What will the compiler do?
 
-See this talk online: https://maciekgajewski.github.io/CloserLookAtUB/
+See this slides online: https://maciekgajewski.github.io/CloserLookAtUB/
 
 ## About
 
