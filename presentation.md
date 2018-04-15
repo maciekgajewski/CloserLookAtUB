@@ -97,7 +97,7 @@ Too long to read during the presentation
 ]
 
 ???
-Survey the audience: who knows compiler exporer?
+Survey the audience: who knows compiler explorer?
 Great tool for teachers and tweakers
 Basic assembly required
 
@@ -334,7 +334,7 @@ static unsigned int tun_chr_poll(struct file *file, poll_table * wait)
 
 https://lwn.net/Articles/342330/
 ???
-It is C, so variable intiializations must be at the beginning
+It is C, so variable initializations must be at the beginning
 
 "The TUN/TAP driver provides a virtual network device which performs packet tunneling; it's useful in a number of situations, including virtualization, virtual private networks, and more. "
 ---
@@ -410,7 +410,7 @@ int fun(int, int val) {
 Seems like a contrived example, but the code may be a result of 
 - inlining, 
 - dead-branch remove, 
-- compile-time evauation of constant expressions
+- compile-time evaluation of constant expressions
 
 ---
 
@@ -537,7 +537,7 @@ void zero_arr(float* arr, int off)
 ]
 --
 .pull-right[
-is compiled to the eqivalent of
+is compiled to the equivalent of
 ```cpp
 void zero_arr(float* arr, int off)
 {
@@ -547,7 +547,7 @@ void zero_arr(float* arr, int off)
 ]
 
 ???
-Nice, huh? memset probably uses all the vectorization techniquest your CPU supports.
+Nice, huh? memset probably uses all the vectorization techniques your CPU supports.
 
 ---
 # Optimization
