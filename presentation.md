@@ -88,7 +88,7 @@ Too long to read during the presentation
 # Let's have a closer look
 
 * Compiler Explorer: https://godbolt.org
-* By Matt Gotbolt
+* By Matt Godbolt
 * CppCon 2017 _“What Has My Compiler Done for Me Lately?”_
 
 
@@ -537,7 +537,7 @@ void zero_arr(float* arr, int off)
 ]
 --
 .pull-right[
-is compiled to the eqivalent of
+is compiled to the equivalent of
 ```cpp
 void zero_arr(float* arr, int off)
 {
@@ -547,7 +547,7 @@ void zero_arr(float* arr, int off)
 ]
 
 ???
-Nice, huh? memset probably uses all the vectorization techniquest your CPU supports.
+Nice, huh? memset probably uses all the vectorization techniques your CPU supports.
 
 ---
 # Optimization
