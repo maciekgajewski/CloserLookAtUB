@@ -10,4 +10,4 @@ See this slides online: https://maciekgajewski.github.io/CloserLookAtUB/
 ## About
 
 This talk was prepared for C++ Meetup in Amsterda, April 2018.
-It is a development of my previous talk on UB, whihc I presented at meet-up in Rotterdam, 26-01-2018 (https://maciekgajewski.github.io/QuickButCloseLookAtUB/index.html#/)
+It is a development of my previous talk on UB, which I presented at meet-up in Rotterdam, 26-01-2018 (https://maciekgajewski.github.io/QuickButCloseLookAtUB/index.html#/)
