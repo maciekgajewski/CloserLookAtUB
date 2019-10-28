@@ -7,34 +7,24 @@ Maciej Gajewski
 
 ---
 
-# About Optiver
-
-* Amsterdam, Sydney, Chicago, Shanghai
-* Established in 1986
-* 440 people, 44 nationalities in Amsterdam
-* Big user of C++, mostly in Low Latency space
-* See Carl Cook's _"When a Microsecond Is an Eternity"_, CppCon2017
-
-.center[
-<img src="pics/optiver_logo_black.png" height="100"/>
-]
----
-
 # About me
 
 * Maciek Gajewski [maciej.gajewski0@gmail.com](mailto:maciej.gajewski0@gmail.com)
 * 30 years of programming, 20 years of C++
-* Role at Optiver: C++ Developer and teacher
+* 2000-2010 Wrocław (Pruftechnik, Tieto)
+* 2010-2018 London, Amsterdam, 
+* HFT, teaching (Tibra, Optiver)
 
 
 .center[
-<img src="pics/Maciek.jpg" height="200"/>
+<img src="pics/Maciek.jpg" height="250"/>
 ]
 ---
 
 # Undefined Behavior
 ### What triggers UB in C++
 
+* Data race (simultaneous read and write)
 * Dereferencing null/wild pointer
 * Accessing array out of bounds
 * Overflowing signed integer
@@ -100,6 +90,58 @@ Too long to read during the presentation
 Survey the audience: who knows compiler explorer?
 Great tool for teachers and tweakers
 Basic assembly required
+
+<!-- ======= Data race ========== -->
+
+---
+class: center, middle
+# Chapter 1
+## Data race
+
+---
+When an evaluation of an expression writes to a memory location and another evaluation reads or modifies the same memory location, the expressions are said to conflict. A program that has two conflicting evaluations has a data race [...].
+If a data race occurs, the behavior of the program is undefined.
+
+???
+
+The [...] is:
+
+Unless
+* both evaluations execute on the same thread or in the same signal handler, or
+* both conflicting evaluations are atomic operations (see std::atomic), or
+* one of the conflicting evaluations happens-before another (see std::memory_order)
+
+---
+This code...
+```cpp
+int x = 1;
+
+void  fun(int c) {
+	x = 7;
+    x = 666;
+    x = 3;
+
+    for(int i = 0; i < c; ++i)
+        x = i;
+}
+```
+--
+will be compiled as
+```cpp
+int x = 1;
+
+void  fun(int c) {
+	if (c > 0)
+        x = c-1;
+    else
+        x = 3;
+}
+```
+
+???
+Compiler is allowed to ignore any intermediate state of 'x', as long as the final, observable effect is the same.
+What would happen to a hi prio thread observing 'x'? It would not see the expected, intermediate values (7, 666, 0..c)
+"Compiler compiles only one thread at a time" (Herb Sutter, "atomic<> weapons")
 
 <!-- ====== Null pointer ======== -->
 
