@@ -22,6 +22,7 @@ Maciej Gajewski
 ---
 
 # Undefined Behavior
+
 ### What triggers UB in C++
 
 * Data race (simultaneous read and write)
@@ -30,8 +31,8 @@ Maciej Gajewski
 * Overflowing signed integer
 * Using uninitialized value
 * Oversized integer shift
-* Violating type rules
 * Division by zero
+
 ---
 
 # Undefined Behavior
@@ -99,19 +100,7 @@ class: center, middle
 ## Data race
 
 ---
-When an evaluation of an expression writes to a memory location and another evaluation reads or modifies the same memory location, the expressions are said to conflict. A program that has two conflicting evaluations has a data race [...].
-If a data race occurs, the behavior of the program is undefined.
 
-???
-
-The [...] is:
-
-Unless
-* both evaluations execute on the same thread or in the same signal handler, or
-* both conflicting evaluations are atomic operations (see std::atomic), or
-* one of the conflicting evaluations happens-before another (see std::memory_order)
-
----
 This code...
 ```cpp
 int x = 1;
@@ -139,6 +128,15 @@ void  fun(int c) {
 ```
 
 ???
+
+When an evaluation of an expression writes to a memory location and another evaluation reads or modifies the same memory location, the expressions are said to conflict. A program that has two conflicting evaluations has a data race, unless:
+
+* both evaluations execute on the same thread or in the same signal handler, or
+* both conflicting evaluations are atomic operations (see std::atomic), or
+* one of the conflicting evaluations happens-before another (see std::memory_order)
+
+If a data race occurs, the behavior of the program is undefined.
+
 Compiler is allowed to ignore any intermediate state of 'x', as long as the final, observable effect is the same.
 What would happen to a hi prio thread observing 'x'? It would not see the expected, intermediate values (7, 666, 0..c)
 "Compiler compiles only one thread at a time" (Herb Sutter, "atomic<> weapons")
@@ -147,46 +145,15 @@ What would happen to a hi prio thread observing 'x'? It would not see the expect
 
 ---
 class: center, middle
-# Chapter 1
+# Chapter 2
 ## Null-pointer dereference
 
----
-
-### If dereferencing nullptr was defined...
-
-This C code...
-```cpp
-size_t fread(void* buf, size_t size, FILE* s)
-{
-	if(s->bsize == 0) {
-		s->bsize = (*s->vtbl->read)(s->buf, s->bufsize, s->fd);
-	}
-	return copy_from_buffer(buf, size, s);
-}
-```
---
-would really be this:
-```c
-size_t fread(void* buf, size_t size, FILE* s)
-{
-	`if (!s) __raise_error();`
-	if(s->bsize == 0) {
-		`if (!s->vtbl || ! s->vtbl->read) __raise_error();`
-		s->bsize = (*s->vtbl->read)(s->buf, s->bufsize, s->fd);
-	}
-	return copy_from_buffer(buf, size, s);
-}
-```
-
-???
-Compiler would be forced to generate code checking for null pointer every time a pointer is accessed.
-And if this is not C++ enough....
 
 ---
 
 ### If dereferencing nullptr was defined...
 
-This C++ code...
+If this C++ code...
 ```cpp
 size_t File::read(void* buf, size_t size)
 {
@@ -196,8 +163,8 @@ size_t File::read(void* buf, size_t size)
 	return copy_from_buffer(buf, size);
 }
 ```
-would really be this:
-```c
+would really be this ?
+```cpp
 size_t File::read(File* this, void* buf, size_t size)
 {
 	`if (!this) __raise_error();`
@@ -208,18 +175,56 @@ size_t File::read(File* this, void* buf, size_t size)
 	return copy_from_buffer(this, buf, size);
 }
 ```
+--
+NO!!!!
 
 ???
+In the first version of this presentation, I used this slid. It is not true!
+Hardware can trap null pointer reference on most architectures, and JRE is using it!
+
+Compiler would be forced to generate code checking for null pointer every time a pointer is accessed.
 But compilers are not doing that!
 
 ---
+But this...
+```cpp
+class Widget {
+	int getSize() const { return 3; }
+};
+int get_size(Widget& w) {
+	return w.getSize();
+}
+```
+--
+will be this:
+```cpp
+int get_size(Widget& w) { return 3; }
+```
+--
+But Java _has_ to do this:
+```cpp
+int get_size(Widget* w) {
+	if (!w) throw NulPointerException();
+	return 3; 
+}
+
+```
+
+???
+Even if getSize is virtual, but compiler is able to de-virtualize it, it can greatly simplify the function.
+The 'this' pointer is not usd,. no need to check for it. _Compiler can assume it is not null_.
+
+Java has no such freedom.
+
+---
+
 ### Dereferencing nullptr
 
 .pull-left[
 This code
 ```cpp
 // Safe to call with nullptr
-void fun(Widget* w) {
+void fun1(Widget* w) {
 	if (w)
 		do_smth(w->data);
 	else
@@ -229,25 +234,18 @@ void fun(Widget* w) {
 // 'w' can't be null!
 void fun2(Widget* w) {
 	w->data = get_data();
-	fun(w);
+	fun1(w);
 }
 ```
 ]
 --
 .pull-right[
-	after inlining
+	fun2, after inlining
 ```cpp
-// Safe to call with nullptr
-void fun(Widget* w) {
-	if (w)
-		do_smth(w->data);
-	else
-		report_error();
-}
-
 // 'w' can't be null!
 void fun2(Widget* w) {
 	w->data = get_data();
+
 	if (w)
 		do_smth(w->data);
 	else
@@ -266,7 +264,7 @@ first step - inlining
 This code
 ```cpp
 // Safe to call with nullptr
-void fun(Widget* w) {
+void fun1(Widget* w) {
 	if (w)
 		do_smth(w->data);
 	else
@@ -276,24 +274,17 @@ void fun(Widget* w) {
 // 'w' can't be null!
 void fun2(Widget* w) {
 	w->data = get_data();
-	fun(w);
+	fun1(w);
 }
 ```
 ]
 .pull-right[
 	after inlining
 ```cpp
-// Safe to call with nullptr
-void fun(Widget* w) {
-	if (w)
-		do_smth(w->data);
-	else
-		report_error();
-}
-
 // 'w' can't be null!
 void fun2(Widget* w) {
 	w->data = get_data();
+
 	`if (w)`
 		do_smth(w->data);
 	`else`
@@ -312,7 +303,7 @@ next step - removing null branch
 This code
 ```cpp
 // Safe to call with nullptr
-void fun(Widget* w) {
+void fun1(Widget* w) {
 	if (w)
 		do_smth(w->data);
 	else
@@ -329,17 +320,10 @@ void fun2(Widget* w) {
 .pull-right[
 optimized
 ```cpp
-// Safe to call with nullptr
-void fun(Widget* w) {
-	if (w)
-		do_smth(w->data);
-	else
-		report_error();
-}
-
 // 'w' can't be null!
 void fun2(Widget* w) {
 	w->data = get_data();
+
 	do_smth(w->data);
 }
 ```
@@ -423,7 +407,7 @@ Attacker may actually map some malicious code at address 0
 
 ---
 class: center, middle
-# Chapter 2
+# Chapter 3
 ## Accessing array out of bounds
 
 ---
@@ -561,7 +545,7 @@ background-image: url(pics/ubdiagram2.png)
 <!-- --------- Signed integer overflow            -->
 ---
 class: center, middle
-# Chapter 3
+# Chapter 4
 ## Signed integer overflow
 
 ---
@@ -673,7 +657,7 @@ void zero_arr(float* arr, int off)
 <!-- --------- Using undefined value            -->
 ---
 class: center, middle
-# Chapter 4
+# Chapter 5
 ## Use of an uninitialized variable
 
 ---
@@ -825,6 +809,6 @@ Also a manifestation of dereferencing nullptr
 * This presentation: https://maciekgajewski.github.io/CloserLookAtUB/
 * Compiler Explorer: https://gcc.godbolt.org
 * CppCon 2017, _“What Has My Compiler Done for Me Lately?”_, Matt Godbolt
-* CppCon 2017, _"When a Microsecond Is an Eternity"_, Carl Cook
+* CppCon 2016, _"Garbage in, Garbage Out"_, Chandler Carruth
 * LLVM Project Blog, _"What Every C Programmer Should Know About Undefined Behavior"_
 * _"Undefined Behavior != Unsafe Programming"_ https://blog.regehr.org/archives/1467
