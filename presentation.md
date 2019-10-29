@@ -480,8 +480,7 @@ bool is_in_arr(array<T, N> arr, T v)
 
 bool is_right_angle(int deg)
 {
-	array<int, 4> arr 
-		= {0, 90, 180, 270};
+	array arr = {0, 90, 180, 270};
 	return is_in_arr(arr, deg);
 }```
 ]
@@ -521,8 +520,7 @@ bool is_in_arr(array<T, N> arr, T v)
 
 bool is_right_angle(int deg)
 {
-	array<int, 4> arr 
-		= {0, 90, 180, 270};
+	array arr = {0, 90, 180, 270};
 	return is_in_arr(arr, deg);
 }```
 ]
