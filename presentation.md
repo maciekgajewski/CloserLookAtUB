@@ -55,6 +55,7 @@ Will demons fly out of your nose if you dereference nullptr? If you use uninitia
 # Undefined Behavior
 ### More useful definition
 
+* It's a bug in your code!
 * Machine-dependent behavior that would be too costly to define
 * Something, that compiler can assume you would never do
 --
@@ -191,6 +192,7 @@ But this...
 class Widget {
 	int getSize() const { return 3; }
 };
+
 int get_size(Widget& w) {
 	return w.getSize();
 }
